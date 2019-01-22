@@ -249,6 +249,11 @@ services:
       - PORT=8085
     ports:
       - 8085:8085
+    labels:
+      - traefik.backend=authprovider
+      - "traefik.authprovider.frontend.rule=PathPrefixStrip: /authprovider"
+      - traefik.docker.network=plataforma_network
+      - traefik.port=8085
   celery:
     build:
       context: ./Dockerfiles
