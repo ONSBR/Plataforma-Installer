@@ -1,7 +1,7 @@
 FROM pmoneda/domain_base:latest
 
 WORKDIR /usr/src
-RUN git clone https://github.com/ONSBR/Plataforma-ApiCore.git
+RUN git clone --branch feature/save-process-instance-owner https://github.com/ONSBR/Plataforma-ApiCore.git
 RUN ls ./Plataforma-ApiCore
 WORKDIR /usr/src/Plataforma-ApiCore/plataforma_apicore
 RUN pwd

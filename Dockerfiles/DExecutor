@@ -1,6 +1,6 @@
 FROM pmoneda/executor_base:latest
 
 WORKDIR /app
-RUN git clone https://github.com/ONSBR/Plataforma-Executor.git /app
+RUN git clone --branch feature/add-owner-process-instance https://github.com/ONSBR/Plataforma-Executor.git /app
 EXPOSE 8000
 ENTRYPOINT $EXEC
