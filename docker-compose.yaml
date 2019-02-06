@@ -61,14 +61,6 @@ services:
       - COREAPI_PORT=9110
     depends_on:
       - "postgres"
-  git-server:
-    image: pmoneda/git-server
-    container_name: git-server
-    ports:
-      - "2222:22"
-    volumes:
-      - ~/git-server/keys:/git-server/keys
-      - ~/git-server/repos:/git-server/repos
   event_manager:
     build:
       context: ./Dockerfiles
@@ -190,41 +182,6 @@ services:
       - "event_manager"
       - "rabbitmq"
       - "postgres"
-  deployer:
-    build:
-      context: ./Dockerfiles
-      dockerfile: DDeployer
-    container_name: "deployer"
-    ports:
-      - 6970:6970
-    environment:
-      - GIT_SERVER_PATH=/git-server
-      - DEPLOY_PATH=/worker/deploys
-      - GET_SERVER_HOST=git-server
-      - DEPLOYER_HOST=deployer
-      - APICORE_HOST=apicore
-      - EVENT_MANAGER_HOST=event_manager
-    volumes:
-      - ~/git-server/repos:/git-server/repos
-      - ~/git-server/keys:/git-server/keys
-      - /var/run/docker.sock:/var/run/docker.sock
-    depends_on:
-      - "apicore"
-      - "rabbitmq"
-      - "postgres"
-  portainer:
-    image: "portainer/portainer"
-    container_name: "portainer"
-    command: --no-auth
-    ports:
-      - 9000:9000
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      - traefik.backend=portainer
-      - "traefik.portainer.frontend.rule=PathPrefixStrip: /portainer"
-      - traefik.docker.network=plataforma_network
-      - traefik.port=9000
   executor:
     build:
       context: ./Dockerfiles
@@ -300,12 +257,6 @@ services:
       - "traefik.rabbitmq.frontend.rule=PathPrefixStrip: /rabbitmq"
       - traefik.docker.network=plataforma_network
       - traefik.port=15672
-  chronograf:
-    image: chronograf:alpine
-    container_name: "chronograf"
-    ports:
-      - 8888:8888
-
   logspout:
     build:
       context: ./Dockerfiles
