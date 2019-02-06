@@ -1,4 +1,4 @@
-FROM pmoneda/go_alpine:latest
+FROM alpine:latest
 ADD discovery /
 ENV PORT 8090
 RUN chmod +x discovery

@@ -1,4 +1,4 @@
-FROM pmoneda/go_alpine:latest
+FROM alpine:latest
 WORKDIR /app
 COPY front .
 ENV PORT 8384

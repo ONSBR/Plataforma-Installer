@@ -1,4 +1,4 @@
-FROM pmoneda/go_alpine:latest
+FROM alpine:latest
 ADD event-manager /
 ENV PORT 8081
 RUN chmod +x event-manager
