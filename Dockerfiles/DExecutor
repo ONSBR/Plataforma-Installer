@@ -1,6 +1,12 @@
-FROM pmoneda/executor_base:latest
+FROM python:3.6.3-slim
 
+RUN apt-get update -y && apt-get install git -y
+
+RUN git clone https://github.com/ONSBR/Plataforma-Executor.git /app
 WORKDIR /app
-RUN git clone --branch feature/add-owner-process-instance https://github.com/ONSBR/Plataforma-Executor.git /app
+
+RUN pip install -U pip gunicorn
+RUN pip install -r requirements.txt
+
 EXPOSE 8000
 ENTRYPOINT $EXEC
