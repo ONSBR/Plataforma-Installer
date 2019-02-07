@@ -1,22 +1,11 @@
 version: "2"
 
 services:
-  reverse-proxy:
-    image: traefik # The official Traefik docker image
-    command: --api --docker # Enables the web UI and tells Træfik to listen to docker
-    container_name: proxy
-    ports:
-      - 80:80     # The HTTP port
-      - 8089:8080 # The Web UI (enabled by --api)
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
   postgres:
     image: postgres:latest
     container_name: "postgres"
     ports:
       - 5432:5432
-    volumes:
-      - ~/plataforma_tapes:/tapes
   mongo:
     image: mongo:latest
     container_name: "mongo"
@@ -47,6 +36,7 @@ services:
       - traefik.docker.network=plataforma_network
       - traefik.port=9091
   apicore:
+    image: "apicore"
     build:
       context: ./Dockerfiles
       dockerfile: DApiCore
@@ -136,9 +126,6 @@ services:
     container_name: "replay"
     ports:
       - 6081:6081
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ~/plataforma_tapes:/tapes
     environment:
       - APICORE_HOST=apicore
       - TAPES_PATH=/tapes
@@ -216,8 +203,6 @@ services:
       context: ./Dockerfiles
       dockerfile: DCelery
     container_name: "celery"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - DEBUG_MODE=True
       - REMOVE_CONTAINER_AFTER_EXECUTION=False
@@ -257,21 +242,6 @@ services:
       - "traefik.rabbitmq.frontend.rule=PathPrefixStrip: /rabbitmq"
       - traefik.docker.network=plataforma_network
       - traefik.port=15672
-  logspout:
-    build:
-      context: ./Dockerfiles
-      dockerfile: DLogspout
-    container_name: "logspout"
-    labels:
-      - traefik.backend=logspout
-      - "traefik.logspout.frontend.rule=PathPrefixStrip: /logspout"
-      - traefik.docker.network=plataforma_network
-      - traefik.port=80
-    ports:
-      - 8400:80
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ~/plataforma_logs:/logs
 networks:
   default:
     external:
