@@ -1,4 +1,4 @@
-FROM pmoneda/go_alpine:latest
+FROM alpine:latest
 ADD replay /
 RUN mkdir tapes
 ENV PORT 6081

@@ -1,4 +1,4 @@
-FROM pmoneda/go_alpine:latest
+FROM alpine:latest
 ADD logspout /
 ENV PORT 80
 RUN mkdir logs
