@@ -1,16 +1,14 @@
-FROM pmoneda/domain_base:latest
+FROM python:3.6.3-slim
 
-WORKDIR /usr/src
-RUN git clone --branch feature/save-process-instance-owner https://github.com/ONSBR/Plataforma-ApiCore.git
-RUN ls ./Plataforma-ApiCore
-WORKDIR /usr/src/Plataforma-ApiCore/plataforma_apicore
-RUN pwd
+RUN git clone https://github.com/ONSBR/Plataforma-ApiCore.git /app
+WORKDIR /app/Plataforma-ApiCore/plataforma_apicore
 
 ENV PORT=9110
 ENV POSTGRES_HOST postgres
 ENV POSTGRES_USER postgres
 
 RUN pip install -r requirements.txt
+RUN pip install -U pip gunicorn
 
 EXPOSE 9110
 ENTRYPOINT python main.py && gunicorn -b 0.0.0.0:9110 app.wsgi:app
