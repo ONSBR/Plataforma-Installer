@@ -2,41 +2,44 @@ version: "2"
 
 services:
   postgres:
-    image: postgres:latest
+    image: centos/postgresql-95-centos7
     container_name: "postgres"
     ports:
       - 5432:5432
+    labels:
+      kompose.volume.size: 512M
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRESQL_USER=plataforma 
+      - POSTGRESQL_PASSWORD=qazwsx
+      - POSTGRESQL_DATABASE=plataforma
   mongo:
-    image: mongo:latest
+    image: openshift/mongodb-24-centos7
     container_name: "mongo"
     ports:
       - 27017:27017
-  adminer:
-    image: adminer:latest
-    container_name: "adminer"
-    ports:
-      - 8080:8080
     labels:
-      - traefik.backend=adminer
-      - "traefik.adminer.frontend.rule=PathPrefixStrip: /adminer"
-      - traefik.docker.network=plataforma_network
-      - traefik.port=8080
-  process_memory:
+      kompose.volume.size: 512M
+    volumes:
+      - mongo-data:/var/lib/mongodb
+    environment:
+      - MONGODB_USER=plataforma
+      - MONGODB_PASSWORD=qazwsx
+      - MONGODB_DATABASE=plataforma
+      - MONGODB_ADMIN_PASSWORD=qazwsx
+  process-memory:
+    image: "onsplataforma/process-memory"
     build:
       context: ./Dockerfiles
       dockerfile: DProcessMemory
-    container_name: "process_memory"
+    container_name: "process-memory"
     ports:
       - 9091:9091
     environment:
       - MONGO_HOST=mongo
-    labels:
-      - traefik.backend=process_memory
-      - "traefik.process_memory.frontend.rule=PathPrefixStrip: /process_memory"
-      - traefik.docker.network=plataforma_network
-      - traefik.port=9091
   apicore:
-    image: "apicore"
+    image: "onsplataforma/apicore"
     build:
       context: ./Dockerfiles
       dockerfile: DApiCore
@@ -49,19 +52,18 @@ services:
       - PROCESS_MEMORY_PORT=9091
       - COREAPI_URL=apicore
       - COREAPI_PORT=9110
-    depends_on:
-      - "postgres"
-  event_manager:
+  event-manager:
+    image: "onsplataforma/event-manager"
     build:
       context: ./Dockerfiles
       dockerfile: DEventManager
-    container_name: "event_manager"
+    container_name: "event-manager"
     ports:
       - 8081:8081
     environment:
       - EXECUTOR_HOST=executor
       - REPLAY_HOST=replay
-      - PROCESS_MEMORY_HOST=process_memory
+      - PROCESS_MEMORY_HOST=process-memory
       - ROUTER_HOST=http_router
       - INFLUX_HOST=influxdb
       - APICORE_HOST=apicore
@@ -76,6 +78,7 @@ services:
       - "rabbitmq"
       - "postgres"
   maestro:
+    image: "onsplataforma/maestro"
     build:
       context: ./Dockerfiles
       dockerfile: DMaestro
@@ -85,7 +88,7 @@ services:
     environment:
       - EXECUTOR_HOST=executor
       - DISCOVERY_HOST=discovery
-      - PROCESS_MEMORY_HOST=process_memory
+      - PROCESS_MEMORY_HOST=process-memory
       - ROUTER_HOST=http_router
       - INFLUX_HOST=influxdb
       - APICORE_HOST=apicore
@@ -95,15 +98,16 @@ services:
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
       - MONGO_HOST=mongo:27017
-      - EVENT_MANAGER_HOST=event_manager
+      - EVENT_MANAGER_HOST=event-manager
       - WAUTO_REPROCESSING_ec498841-59e5-47fd-8075-136d79155705=True
     depends_on:
-      - "event_manager"
+      - "onsplataforma/event-manager"
       - "apicore"
       - "discovery"
       - "rabbitmq"
-      - "process_memory"
+      - "process-memory"
   discovery:
+    image: "onsplataforma/discovery"
     build:
       context: ./Dockerfiles
       dockerfile: DDiscovery
@@ -111,37 +115,16 @@ services:
     ports:
       - 8090:8090
     environment:
-      - PROCESS_MEMORY_HOST=process_memory
+      - PROCESS_MEMORY_HOST=process-memory
       - APICORE_HOST=apicore
       - POSTGRES_HOST=postgres
     depends_on:
-      - "apicore"
-      - "process_memory"
-      - "rabbitmq"
-      - "postgres"
-  replay:
-    build:
-      context: ./Dockerfiles
-      dockerfile: DReplay
-    container_name: "replay"
-    ports:
-      - 6081:6081
-    environment:
-      - APICORE_HOST=apicore
-      - TAPES_PATH=/tapes
-      - POSTGRES_HOST=postgres
-      - EVENT_MANAGER_HOST=event_manager
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_API_PORT=15672
-      - RABBITMQ_AMQP_PORT=5672
-      - RABBITMQ_USERNAME=guest
-      - RABBITMQ_PASSWORD=guest
-    depends_on:
-      - "apicore"
-      - "event_manager"
+      - "onsplataforma/apicore"
+      - "process-memory"
       - "rabbitmq"
       - "postgres"
   ui:
+    image: "onsplataforma/ui"
     build:
       context: ./Dockerfiles
       dockerfile: DFront
@@ -149,42 +132,39 @@ services:
     ports:
       - 8384:8384
     environment:
-      - PROCESS_MEMORY_HOST=process_memory
+      - PROCESS_MEMORY_HOST=process-memory
       - REPLAY_HOST=replay
       - APICORE_HOST=apicore
-      - EVENT_MANAGER_HOST=event_manager
+      - EVENT_MANAGER_HOST=event-manager
       - MAESTRO_HOST=maestro
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_API_PORT=15672
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
-    labels:
-      - traefik.backend=ui
-      - "traefik.ui.frontend.rule=PathPrefixStrip: /ui"
-      - traefik.docker.network=plataforma_network
-      - traefik.port=8384
     depends_on:
-      - "apicore"
-      - "process_memory"
-      - "event_manager"
+      - "onsplataforma/apicore"
+      - "process-memory"
+      - "event-manager"
       - "rabbitmq"
       - "postgres"
   executor:
+    image: "onsplataforma/executor"
     build:
       context: ./Dockerfiles
       dockerfile: DExecutor
     container_name: "executor"
     environment:
-      - PROCESS_MEMORY_URL=process_memory
+      - PROCESS_MEMORY_URL=process-memory
       - PROCESS_MEMORY_PORT=9091
       - COREAPI_URL=apicore
       - COREAPI_PORT=9110
-      - EVENT_MANAGER_URL=event_manager
+      - EVENT_MANAGER_URL=event-manager
       - EVENT_MANAGER_PORT=8081
       - EXEC=gunicorn -b :8000 runner.api:runner_api
     ports:
       - 8000:8000
   authprovider:
+    image: "onsplataforma/authprovider"
     build:
       context: ./Dockerfiles
       dockerfile: DAuthProvider
@@ -193,12 +173,8 @@ services:
       - PORT=8085
     ports:
       - 8085:8085
-    labels:
-      - traefik.backend=authprovider
-      - "traefik.authprovider.frontend.rule=PathPrefixStrip: /authprovider"
-      - traefik.docker.network=plataforma_network
-      - traefik.port=8085
   celery:
+    image: "onsplataforma/celery"
     build:
       context: ./Dockerfiles
       dockerfile: DCelery
@@ -206,11 +182,11 @@ services:
     environment:
       - DEBUG_MODE=True
       - REMOVE_CONTAINER_AFTER_EXECUTION=False
-      - PROCESS_MEMORY_URL=process_memory
+      - PROCESS_MEMORY_URL=process-memory
       - PROCESS_MEMORY_PORT=9091
       - COREAPI_URL=apicore
       - COREAPI_PORT=9110
-      - EVENT_MANAGER_URL=event_manager
+      - EVENT_MANAGER_URL=event-manager
       - EVENT_MANAGER_PORT=8081
       - RABBITMQ_URL=rabbitmq
       - RABBITMQ_PORT=5672
@@ -218,16 +194,11 @@ services:
       - RABBITMQ_PASSWORD=guest
       - C_FORCE_ROOT=true
     depends_on:
-      - "event_manager"
+      - "onsplataforma/event-manager"
       - "rabbitmq"
       - "postgres"
-  registry:
-    image: "registry:2"
-    container_name: "registry"
-    ports:
-      - 5000:5000
   influxdb:
-    image: influxdb:alpine
+    image: robertbohne/influxdb
     container_name: "influxdb"
     ports:
       - "8086:8086"
@@ -237,11 +208,6 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
-    labels:
-      - traefik.backend=rabbitmq
-      - "traefik.rabbitmq.frontend.rule=PathPrefixStrip: /rabbitmq"
-      - traefik.docker.network=plataforma_network
-      - traefik.port=15672
 networks:
   default:
     external:
