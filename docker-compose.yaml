@@ -1,45 +1,52 @@
 version: "2"
 
 services:
+  reverse-proxy:
+    image: traefik # The official Traefik docker image
+    command: --api --docker # Enables the web UI and tells Træfik to listen to docker
+    container_name: proxy
+    ports:
+      - 80:80     # The HTTP port
+      - 8089:8080 # The Web UI (enabled by --api)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
   postgres:
-    image: centos/postgresql-95-centos7
+    image: postgres:latest
     container_name: "postgres"
     ports:
       - 5432:5432
-    labels:
-      kompose.volume.size: 512M
     volumes:
-      - pg-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRESQL_USER=plataforma 
-      - POSTGRESQL_PASSWORD=qazwsx
-      - POSTGRESQL_DATABASE=plataforma
+      - ~/plataforma_tapes:/tapes
   mongo:
-    image: openshift/mongodb-24-centos7
+    image: mongo:latest
     container_name: "mongo"
     ports:
       - 27017:27017
+  adminer:
+    image: adminer:latest
+    container_name: "adminer"
+    ports:
+      - 8080:8080
     labels:
-      kompose.volume.size: 512M
-    volumes:
-      - mongo-data:/var/lib/mongodb
-    environment:
-      - MONGODB_USER=plataforma
-      - MONGODB_PASSWORD=qazwsx
-      - MONGODB_DATABASE=plataforma
-      - MONGODB_ADMIN_PASSWORD=qazwsx
-  process-memory:
-    image: "onsplataforma/process-memory"
+      - traefik.backend=adminer
+      - "traefik.adminer.frontend.rule=PathPrefixStrip: /adminer"
+      - traefik.docker.network=plataforma_network
+      - traefik.port=8080
+  process_memory:
     build:
       context: ./Dockerfiles
       dockerfile: DProcessMemory
-    container_name: "process-memory"
+    container_name: "process_memory"
     ports:
       - 9091:9091
     environment:
       - MONGO_HOST=mongo
+    labels:
+      - traefik.backend=process_memory
+      - "traefik.process_memory.frontend.rule=PathPrefixStrip: /process_memory"
+      - traefik.docker.network=plataforma_network
+      - traefik.port=9091
   apicore:
-    image: "onsplataforma/apicore"
     build:
       context: ./Dockerfiles
       dockerfile: DApiCore
@@ -52,18 +59,27 @@ services:
       - PROCESS_MEMORY_PORT=9091
       - COREAPI_URL=apicore
       - COREAPI_PORT=9110
-  event-manager:
-    image: "onsplataforma/event-manager"
+    depends_on:
+      - "postgres"
+  git-server:
+    image: pmoneda/git-server
+    container_name: git-server
+    ports:
+      - "2222:22"
+    volumes:
+      - ~/git-server/keys:/git-server/keys
+      - ~/git-server/repos:/git-server/repos
+  event_manager:
     build:
       context: ./Dockerfiles
       dockerfile: DEventManager
-    container_name: "event-manager"
+    container_name: "event_manager"
     ports:
       - 8081:8081
     environment:
       - EXECUTOR_HOST=executor
       - REPLAY_HOST=replay
-      - PROCESS_MEMORY_HOST=process-memory
+      - PROCESS_MEMORY_HOST=process_memory
       - ROUTER_HOST=http_router
       - INFLUX_HOST=influxdb
       - APICORE_HOST=apicore
@@ -78,7 +94,6 @@ services:
       - "rabbitmq"
       - "postgres"
   maestro:
-    image: "onsplataforma/maestro"
     build:
       context: ./Dockerfiles
       dockerfile: DMaestro
@@ -88,7 +103,7 @@ services:
     environment:
       - EXECUTOR_HOST=executor
       - DISCOVERY_HOST=discovery
-      - PROCESS_MEMORY_HOST=process-memory
+      - PROCESS_MEMORY_HOST=process_memory
       - ROUTER_HOST=http_router
       - INFLUX_HOST=influxdb
       - APICORE_HOST=apicore
@@ -98,16 +113,15 @@ services:
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
       - MONGO_HOST=mongo:27017
-      - EVENT_MANAGER_HOST=event-manager
+      - EVENT_MANAGER_HOST=event_manager
       - WAUTO_REPROCESSING_ec498841-59e5-47fd-8075-136d79155705=True
     depends_on:
-      - "onsplataforma/event-manager"
+      - "event_manager"
       - "apicore"
       - "discovery"
       - "rabbitmq"
-      - "process-memory"
+      - "process_memory"
   discovery:
-    image: "onsplataforma/discovery"
     build:
       context: ./Dockerfiles
       dockerfile: DDiscovery
@@ -115,16 +129,40 @@ services:
     ports:
       - 8090:8090
     environment:
-      - PROCESS_MEMORY_HOST=process-memory
+      - PROCESS_MEMORY_HOST=process_memory
       - APICORE_HOST=apicore
       - POSTGRES_HOST=postgres
     depends_on:
-      - "onsplataforma/apicore"
-      - "process-memory"
+      - "apicore"
+      - "process_memory"
+      - "rabbitmq"
+      - "postgres"
+  replay:
+    build:
+      context: ./Dockerfiles
+      dockerfile: DReplay
+    container_name: "replay"
+    ports:
+      - 6081:6081
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/plataforma_tapes:/tapes
+    environment:
+      - APICORE_HOST=apicore
+      - TAPES_PATH=/tapes
+      - POSTGRES_HOST=postgres
+      - EVENT_MANAGER_HOST=event_manager
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_API_PORT=15672
+      - RABBITMQ_AMQP_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+    depends_on:
+      - "apicore"
+      - "event_manager"
       - "rabbitmq"
       - "postgres"
   ui:
-    image: "onsplataforma/ui"
     build:
       context: ./Dockerfiles
       dockerfile: DFront
@@ -132,39 +170,77 @@ services:
     ports:
       - 8384:8384
     environment:
-      - PROCESS_MEMORY_HOST=process-memory
+      - PROCESS_MEMORY_HOST=process_memory
       - REPLAY_HOST=replay
       - APICORE_HOST=apicore
-      - EVENT_MANAGER_HOST=event-manager
+      - EVENT_MANAGER_HOST=event_manager
       - MAESTRO_HOST=maestro
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_API_PORT=15672
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
+    labels:
+      - traefik.backend=ui
+      - "traefik.ui.frontend.rule=PathPrefixStrip: /ui"
+      - traefik.docker.network=plataforma_network
+      - traefik.port=8384
     depends_on:
-      - "onsplataforma/apicore"
-      - "process-memory"
-      - "event-manager"
+      - "apicore"
+      - "process_memory"
+      - "event_manager"
       - "rabbitmq"
       - "postgres"
+  deployer:
+    build:
+      context: ./Dockerfiles
+      dockerfile: DDeployer
+    container_name: "deployer"
+    ports:
+      - 6970:6970
+    environment:
+      - GIT_SERVER_PATH=/git-server
+      - DEPLOY_PATH=/worker/deploys
+      - GET_SERVER_HOST=git-server
+      - DEPLOYER_HOST=deployer
+      - APICORE_HOST=apicore
+      - EVENT_MANAGER_HOST=event_manager
+    volumes:
+      - ~/git-server/repos:/git-server/repos
+      - ~/git-server/keys:/git-server/keys
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - "apicore"
+      - "rabbitmq"
+      - "postgres"
+  portainer:
+    image: "portainer/portainer"
+    container_name: "portainer"
+    command: --no-auth
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.backend=portainer
+      - "traefik.portainer.frontend.rule=PathPrefixStrip: /portainer"
+      - traefik.docker.network=plataforma_network
+      - traefik.port=9000
   executor:
-    image: "onsplataforma/executor"
     build:
       context: ./Dockerfiles
       dockerfile: DExecutor
     container_name: "executor"
     environment:
-      - PROCESS_MEMORY_URL=process-memory
+      - PROCESS_MEMORY_URL=process_memory
       - PROCESS_MEMORY_PORT=9091
       - COREAPI_URL=apicore
       - COREAPI_PORT=9110
-      - EVENT_MANAGER_URL=event-manager
+      - EVENT_MANAGER_URL=event_manager
       - EVENT_MANAGER_PORT=8081
       - EXEC=gunicorn -b :8000 runner.api:runner_api
     ports:
       - 8000:8000
   authprovider:
-    image: "onsplataforma/authprovider"
     build:
       context: ./Dockerfiles
       dockerfile: DAuthProvider
@@ -173,20 +249,26 @@ services:
       - PORT=8085
     ports:
       - 8085:8085
+    labels:
+      - traefik.backend=authprovider
+      - "traefik.authprovider.frontend.rule=PathPrefixStrip: /authprovider"
+      - traefik.docker.network=plataforma_network
+      - traefik.port=8085
   celery:
-    image: "onsplataforma/celery"
     build:
       context: ./Dockerfiles
       dockerfile: DCelery
     container_name: "celery"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - DEBUG_MODE=True
       - REMOVE_CONTAINER_AFTER_EXECUTION=False
-      - PROCESS_MEMORY_URL=process-memory
+      - PROCESS_MEMORY_URL=process_memory
       - PROCESS_MEMORY_PORT=9091
       - COREAPI_URL=apicore
       - COREAPI_PORT=9110
-      - EVENT_MANAGER_URL=event-manager
+      - EVENT_MANAGER_URL=event_manager
       - EVENT_MANAGER_PORT=8081
       - RABBITMQ_URL=rabbitmq
       - RABBITMQ_PORT=5672
@@ -194,11 +276,16 @@ services:
       - RABBITMQ_PASSWORD=guest
       - C_FORCE_ROOT=true
     depends_on:
-      - "onsplataforma/event-manager"
+      - "event_manager"
       - "rabbitmq"
       - "postgres"
+  registry:
+    image: "registry:2"
+    container_name: "registry"
+    ports:
+      - 5000:5000
   influxdb:
-    image: robertbohne/influxdb
+    image: influxdb:alpine
     container_name: "influxdb"
     ports:
       - "8086:8086"
@@ -208,6 +295,32 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
+    labels:
+      - traefik.backend=rabbitmq
+      - "traefik.rabbitmq.frontend.rule=PathPrefixStrip: /rabbitmq"
+      - traefik.docker.network=plataforma_network
+      - traefik.port=15672
+  chronograf:
+    image: chronograf:alpine
+    container_name: "chronograf"
+    ports:
+      - 8888:8888
+
+  logspout:
+    build:
+      context: ./Dockerfiles
+      dockerfile: DLogspout
+    container_name: "logspout"
+    labels:
+      - traefik.backend=logspout
+      - "traefik.logspout.frontend.rule=PathPrefixStrip: /logspout"
+      - traefik.docker.network=plataforma_network
+      - traefik.port=80
+    ports:
+      - 8400:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/plataforma_logs:/logs
 networks:
   default:
     external:
