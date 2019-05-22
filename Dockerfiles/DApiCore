@@ -6,9 +6,12 @@ WORKDIR /
 RUN git clone https://github.com/ONSBR/Plataforma-ApiCore.git 
 WORKDIR /Plataforma-ApiCore/plataforma_apicore
 
-ENV PORT=9110
+ENV PORT 9110
 ENV POSTGRES_HOST postgres
 ENV POSTGRES_USER postgres
+ENV POSTGRES_PASSWORD postgres
+ENV DB_PORT 5432
+ENV DB_NAME apicore
 
 RUN pip install -U pip gunicorn
 RUN pip install -r requirements.txt
