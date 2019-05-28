@@ -1,10 +1,13 @@
 FROM python:3.7-stretch
 
 RUN apt-get update -y && apt-get install git -y
+RUN python-dev build-essential libpq-dev libffi-dev libssl-dev
 
 WORKDIR /
 RUN git clone https://github.com/ONSBR/Plataforma-ApiCore.git 
 WORKDIR /Plataforma-ApiCore/plataforma_apicore
+
+
 
 ENV PORT 9110
 # Database connection environment variables
