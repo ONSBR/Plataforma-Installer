@@ -11,9 +11,9 @@ services:
       - 9093:80
     environment:
       - POSTGRES_HOST=postgres
-      - POSTGRES_DB=platform_domain_schema
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=plataforma
+      - POSTGRES_USER=plataforma
+      - POSTGRES_PASSWORD=qazwsx
       - PROCESS_MEMORY_PORT=9091
       - SCHEMA_URI=http://schema/api/v1/entitymap/
   domain-schema:
