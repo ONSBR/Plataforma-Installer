@@ -1,6 +1,36 @@
 version: "2"
 
 services:
+  domain:
+    image: "onsplataforma/domain"
+    build:
+      context: ./Dockerfiles
+      dockerfile: Dockerfile.reader
+    container_name: "domain"
+    ports:
+      - 9093:80
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=platform_domain_schema
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PROCESS_MEMORY_PORT=9091
+      - SCHEMA_URI=http://schema/api/v1/entitymap/
+  domain-schema:
+    image: "onsplataforma/domain-schema"
+    build:
+      context: ./Dockerfiles
+      dockerfile: Dockerfile.schema
+    container_name: "schema"
+    ports:
+      - 9092:80
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=plataforma
+      - POSTGRES_USER=plataforma
+      - POSTGRES_PASSWORD=qazwsx
+      - PROCESS_MEMORY_PORT=9091
+      - RABBIT_MQ=rabbitmq
   postgres:
     image: centos/postgresql-95-centos7
     container_name: "postgres"
