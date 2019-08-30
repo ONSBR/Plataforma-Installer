@@ -7,5 +7,5 @@ RUN pip install pipenv
 
 RUN pipenv install --system --clear
 
-EXPOSE 80
-CMD gunicorn domain.app:api --bind 127.0.0.1:8030
+EXPOSE 8030
+CMD gunicorn domain.app:api --bind 0.0.0.0:8030

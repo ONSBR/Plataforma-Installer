@@ -8,12 +8,12 @@ services:
       dockerfile: Dockerfile.reader
     container_name: "domain"
     ports:
-      - 9093:80
+      - 9093:8030
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_DB=plataforma
-      - POSTGRES_USER=plataforma
-      - POSTGRES_PASSWORD=qazwsx
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
       - PROCESS_MEMORY_PORT=9091
       - SCHEMA_URI=http://schema/api/v1/entitymap/
   domain-schema:
@@ -23,12 +23,12 @@ services:
       dockerfile: Dockerfile.schema
     container_name: "schema"
     ports:
-      - 9092:80
+      - 9092:8030
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_DB=plataforma
-      - POSTGRES_USER=plataforma
-      - POSTGRES_PASSWORD=qazwsx
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
       - PROCESS_MEMORY_PORT=9091
       - RABBIT_MQ=rabbitmq
   postgres:
@@ -41,9 +41,10 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data
     environment:
-      - POSTGRESQL_USER=plataforma 
-      - POSTGRESQL_PASSWORD=qazwsx
+      - POSTGRESQL_USER=plataforma
+      - POSTGRESQL_PASSWORD=postgres
       - POSTGRESQL_DATABASE=plataforma
+      - POSTGRESQL_ADMIN_PASSWORD=postgres
   mongo:
     image: openshift/mongodb-24-centos7
     container_name: "mongo"
