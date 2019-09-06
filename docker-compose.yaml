@@ -38,6 +38,13 @@ services:
     container_name: "domain_schema_worker"
     depends_on:
       - "rabbitmq"
+  domain_reader_worker:
+    build:
+      context: ./Dockerfiles
+      dockerfile: DRWorker
+    container_name: "domain_reader_worker"
+    depends_on:
+      - "rabbitmq"
   domain_reader:
     build:
       context: ./Dockerfiles
