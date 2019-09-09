@@ -26,7 +26,7 @@ services:
     build:
       context: ./Dockerfiles
       dockerfile: DSchema
-    container_name: "domain_schema"
+    container_name: "schema"
     ports:
       - 9092:80
     depends_on:
@@ -35,29 +35,29 @@ services:
     build:
       context: ./Dockerfiles
       dockerfile: DWorker
-    container_name: "domain_schema_worker"
-    depends_on:
-      - "rabbitmq"
-  domain_reader_worker:
-    build:
-      context: ./Dockerfiles
-      dockerfile: DRWorker
-    container_name: "domain_reader_worker"
+    container_name: "schema_worker"
     depends_on:
       - "rabbitmq"
   domain_reader:
     build:
       context: ./Dockerfiles
       dockerfile: DReader
-    container_name: "domain_reader"
+    container_name: "reader"
     ports:
       - 9093:80
     depends_on:
       - "rabbitmq"
       - "postgres"
-      - "domain_schema"
+      - "schema"
     environment:
-      - SCHEMA_URI=http://domain_schema/api/v1/entitymap/
+      - SCHEMA_URI=http://schema/api/v1/entitymap/
+  domain_reader_worker:
+    build:
+      context: ./Dockerfiles
+      dockerfile: DRWorker
+    container_name: "reader_worker"
+    depends_on:
+      - "rabbitmq"
   process_memory:
     build:
       context: ./Dockerfiles
