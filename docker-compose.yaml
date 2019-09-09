@@ -16,7 +16,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ~/plataforma_tapes:/tapes
+      - pgdata:/var/lib/postgresql/data
   mongo:
     image: mongo:latest
     container_name: "mongo"
@@ -277,3 +277,5 @@ networks:
   default:
     external:
       name: plataforma_network
+volumes:
+  pgdata:
