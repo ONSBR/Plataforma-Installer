@@ -48,7 +48,7 @@ services:
     depends_on:
       - "rabbitmq"
       - "postgres"
-      - "schema"
+      - "domain_schema"
     environment:
       - SCHEMA_URI=http://schema/api/v1/entitymap/
   domain_reader_worker:
