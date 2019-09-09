@@ -51,6 +51,7 @@ services:
       - "domain_schema"
     environment:
       - SCHEMA_URI=http://schema/api/v1/entitymap/
+      - POSTGRES_HOST=postgres
   domain_reader_worker:
     build:
       context: ./Dockerfiles
