@@ -28,10 +28,10 @@ docker-compose up -d
 1. A opção *-d* inicia os containers em segundo plano e os deixa ligados. 
 
 A saída esperada é uma lista com os nomes dos containers:
-Creating proxy          ... done
-Creating logspout       ... done
-...
-Creating maestro        ... done
+* Creating proxy          ... done
+* Creating logspout       ... done
+* ...
+* Creating maestro        ... done
 
 Referência: https://docs.docker.com/compose/reference/up/
 
