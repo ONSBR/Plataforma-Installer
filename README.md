@@ -8,7 +8,7 @@ Módulo de instalação da nova versão de domínio da plataforma ("new_domain).
 - Docker Desktop on Windows v2.1 ou superior instalado
   - usar imagens Linux
 
-## Obter e Executar o Plataforma-Installer
+## :ship: Obter e Executar o Plataforma-Installer
 
 1. Clonar instalador da plataforma da branch new-domain:
 ```
