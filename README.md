@@ -4,8 +4,8 @@ instalador da plataforma
 ## Pré-Requisitos
 - Windows 10 64-bit v1903 ou superior
 - Hyper-V habilitado com Recursos de Containers
-- WSL (Windows Subsystem for Linux) habilitado
-- Docker Desktop on Windows instalado
+- WSL (Windows Subsystem for Linux) v1.0 ou superior habilitado
+- Docker Desktop on Windows v2.1 ou superior instalado
   - usar imagens Linux
 
 ## Obter e Executar o Plataforma-Installer
