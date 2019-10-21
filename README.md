@@ -40,12 +40,17 @@ Para facilitar a gestão e visualização de containers no ambiente local, pode-
 ```
 docker run -d -p 9097:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer --no-auth
 ```
-Acessar http://localhost:9097 e selecionar conjunto de containers em localhost. Caso ocorra um erro de login, use uma janela anônima.
+Acessar http://localhost:9097 e selecionar conjunto de containers em localhost. 
 
-### :bomb: Issues Conhecidas
+## :warning: Issues Conhecidas
+
+### Erro no Docker Compose
 Algumas vezes, pode ocorrer com algum repositório, um erro parecido como o abaixo:
 ```
 Cloning into 'Some-Repository'...
 fatal: unable to access 'https://github.com/some_name/Some-Repository.git/': Failed to connect to github.com port 443: Connection refused
 ```
 Para contorná-lo, execute novamente o comando *docker compose up -d* como descrito no passo 3 acima.
+
+### Erro de Login no Portainer
+Pode ocorrer um erro ao tentar acessar o container do Portainer. Caso isso ocorra, acesse o mesmo endereço em uma janela anônima.
