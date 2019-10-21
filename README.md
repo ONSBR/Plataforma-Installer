@@ -1,5 +1,5 @@
 # Plataforma-Installer
-instalador da plataforma
+Módulo de instalação da nova versão de domínio da plataforma ("new_domain). O ambiente foi testado nas versões citadas abaixo no momento da escrita desse documento. Versões mais atualizadas não devem afetar a instalação.
 
 ## Pré-Requisitos
 - Windows 10 64-bit v1903 ou superior
@@ -24,3 +24,11 @@ docker network create plataforma_network
 ```
 docker-compose up -d
 ```
+
+## (Opcional) Instalar o Portainer - Ambiente de Desenvolvimento
+Para facilitar a gestão e visualização de containers no ambiente local, pode-se instalar o Portainer:
+```
+docker run -d -p 9097:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer --no-auth
+```
+Acessar http://localhost:9097 e selecionar conjunto de containers em localhost. Caso ocorra um erro de login, use uma janela anônima.
+
