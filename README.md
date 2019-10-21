@@ -32,3 +32,10 @@ docker run -d -p 9097:9000 -v /var/run/docker.sock:/var/run/docker.sock portaine
 ```
 Acessar http://localhost:9097 e selecionar conjunto de containers em localhost. Caso ocorra um erro de login, use uma janela anônima.
 
+### Issues Conhecidas
+Algumas vezes, pode ocorrer com algum repositório, um erro parecido como o abaixo:
+```
+Cloning into 'Some-Repository'...
+fatal: unable to access 'https://github.com/some_name/Some-Repository.git/': Failed to connect to github.com port 443: Connection refused
+```
+Para contorná-lo, execute novamente o comando *docker compose up -d* como descrito no passo 3 acima.
