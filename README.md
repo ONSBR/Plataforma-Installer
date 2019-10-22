@@ -53,3 +53,10 @@ Para contorná-lo, execute novamente o comando *docker compose up -d* como descr
 
 ### Erro de Login no Portainer
 Pode ocorrer um erro ao tentar acessar o container do Portainer. Caso isso ocorra, acesse o mesmo endereço em uma janela anônima.
+
+### Erro no Container Postgres
+Caso ocorra um erro na qual o Postgres não inicie, verifique os logs.
+```
+The data directory was initialized by PostgreSQL version xx, which is not compatible with this version xx.x (Debian xx.x-x.etc)
+```
+Se os logs possuírem um erro como o acima, apague os volumes de dados da base de dados. Eles provavelmente estão numa versão diferente da base de dados do container.
