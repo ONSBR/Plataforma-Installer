@@ -215,6 +215,8 @@ services:
       - "traefik.authprovider.frontend.rule=PathPrefixStrip: /authprovider"
       - traefik.docker.network=plataforma_network
       - traefik.port=8085
+    extra_hosts:
+      poptst.ons.org.br: 10.107.26.2      
   celery:
     build:
       context: ./Dockerfiles
