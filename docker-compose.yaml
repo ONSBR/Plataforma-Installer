@@ -70,7 +70,6 @@ services:
       - 9091:9091
     environment:
       - MONGO_HOST=mongo
-      - NODE_OPTIONS="--max_old_space_size=4096"
     labels:
       - traefik.backend=process_memory
       - "traefik.process_memory.frontend.rule=PathPrefixStrip: /process_memory"
