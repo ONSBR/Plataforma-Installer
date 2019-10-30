@@ -2,7 +2,7 @@ version: "2"
 
 services:
   reverse-proxy:
-    image: traefik # The official Traefik docker image
+    image: traefik:maroilles # The official Traefik docker image
     command: --api --docker # Enables the web UI and tells Træfik to listen to docker
     container_name: proxy
     ports:
@@ -11,12 +11,14 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   postgres:
-    image: postgres:latest
+    image: postgres:11
     container_name: "postgres"
     ports:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=platform_domain_schema
   mongo:
     image: mongo:latest
     container_name: "mongo"
@@ -214,6 +216,8 @@ services:
       - "traefik.authprovider.frontend.rule=PathPrefixStrip: /authprovider"
       - traefik.docker.network=plataforma_network
       - traefik.port=8085
+    extra_hosts:
+      poptst.ons.org.br: 10.107.26.2      
   celery:
     build:
       context: ./Dockerfiles
