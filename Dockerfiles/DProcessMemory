@@ -3,5 +3,6 @@ FROM node:carbon
 WORKDIR /usr/src
 RUN git clone  https://github.com/ONSBR/Plataforma-ProcessMemory.git
 RUN cd /usr/src/Plataforma-ProcessMemory && npm install
+ENV NODE_OPTIONS --max-old-space-size=4096
 WORKDIR /usr/src/Plataforma-ProcessMemory
 ENTRYPOINT [ "node", "index.js" ]
