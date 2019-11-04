@@ -70,6 +70,7 @@ services:
       - 9091:9091
     environment:
       - MONGO_HOST=mongo
+      - MONGO_OPTIONS="/?ssl=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0"
     labels:
       - traefik.backend=process_memory
       - "traefik.process_memory.frontend.rule=PathPrefixStrip: /process_memory"
