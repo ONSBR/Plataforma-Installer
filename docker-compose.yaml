@@ -278,6 +278,19 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/plataforma_logs:/logs
+  portainer:
+      image: "portainer/portainer"
+      container_name: "portainer"
+      command: --no-auth
+      ports:
+        - 9000:9000
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+      labels:
+        - traefik.backend=portainer
+        - "traefik.portainer.frontend.rule=PathPrefixStrip: /portainer"
+        - traefik.docker.network=plataforma_network
+        - traefik.port=9000
 networks:
   default:
     external:
