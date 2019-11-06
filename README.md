@@ -24,7 +24,10 @@ docker network create plataforma_network
 ```
 docker-compose up -d
 ```
-Esse comando irá buscar um arquivo *docker-compose.yaml* na pasta atual. A opção *-d* inicia os containers em segundo plano e os deixa ligados. 
+Na qual:
+* **docker-compose** irá buscar um arquivo *docker-compose.yaml* na pasta atual.
+* **up** inicia os containers descritos do arquivo de composição.
+* **-d**  *Detached mode*: inicia os containers em segundo plano e imprime os nomes. Incompatível com *--abort-on-container-exit*.
 
 A saída esperada é uma lista com os nomes dos containers:
 * Creating proxy          ... done
