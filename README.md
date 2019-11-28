@@ -17,6 +17,7 @@ Existem duas opções:
 1. Remover a variável de ambiente do Plataforma-Installer antes da sua inicialização, no arquivo docker_compose.yaml:
 ```
 - MONGO_OPTIONS=/?ssl=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0
+```
 
 2. A segunda opção é instalar sem modificações, conectar no container do Process_Memory e remover a variável de ambiente:
 ```
