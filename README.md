@@ -8,22 +8,6 @@ Módulo de instalação da nova versão de domínio da plataforma ("new_domain).
 - Docker Desktop on Windows v2.1 ou superior instalado
   - usar imagens Linux
 
-## :exclamation: Configurar para outros repositórios Mongo
-
-O Plataforma-Installer está configurado para acessar o AWS DocumentDB, e portanto, a variável de ambiente MONGO_OPTIONS possui configurações imcompatíveis com outros repositórios, como o mongodb local.
-
-Existem duas opções:
-
-1. Remover a variável de ambiente do Plataforma-Installer antes da sua inicialização, no arquivo docker_compose.yaml:
-```
-- MONGO_OPTIONS=/?ssl=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0
-```
-
-2. A segunda opção é instalar sem modificações, conectar no container do Process_Memory e remover a variável de ambiente:
-```
-unset MONGO_OPTIONS
-```
-
 ## :ship: Obter e Executar o Plataforma-Installer
 
 1. Clonar instalador da plataforma da branch new-domain:
@@ -52,6 +36,26 @@ A saída esperada é uma lista com os nomes dos containers:
 * Creating maestro        ... done
 
 Referência: https://docs.docker.com/compose/reference/up/
+
+### :exclamation: Configurar para AWS DocumentDB (Amazon)
+
+O Plataforma-Installer está configurado para acessar por padrão repositórios locais, e portanto, a variável de ambiente MONGO_OPTIONS precisa estar presente para que o DocumentDB seja usado.
+
+
+1. Inserir a variável de ambiente antes da sua inicialização, no arquivo docker_compose.yaml:
+```
+  process_memory:
+    build:
+      context: ./Dockerfiles
+      dockerfile: DProcessMemory
+    container_name: "process_memory"
+    ports:
+      - 9091:9091
+    environment:
+      - MONGO_HOST=mongo
+      - MONGO_OPTIONS=/?ssl=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0
+```
+
 
 ### (Opcional) Instalar o Portainer - Ambiente de Desenvolvimento
 Para facilitar a gestão e visualização de containers no ambiente local, pode-se instalar o Portainer:
