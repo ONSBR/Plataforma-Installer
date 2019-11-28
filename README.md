@@ -41,7 +41,7 @@ Referência: https://docs.docker.com/compose/reference/up/
 
 O Plataforma-Installer está configurado para acessar por padrão repositórios locais, e portanto, a variável de ambiente MONGO_OPTIONS precisa estar presente para que o DocumentDB seja usado.
 
-Inserir a variável de ambiente MONGO_OPTIONS antes da sua inicialização, no arquivo docker_compose.yaml:
+1. Inserir a variável de ambiente MONGO_OPTIONS antes da sua inicialização, no arquivo docker_compose.yaml:
 ```
   process_memory:
     build:
@@ -54,7 +54,10 @@ Inserir a variável de ambiente MONGO_OPTIONS antes da sua inicialização, no a
       - MONGO_HOST=mongo
       - MONGO_OPTIONS=/?ssl=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0
 ```
-
+2. Outra opção, caso o container já esteja rodando, é rodar o comando abaixo:
+```
+docker exec -e "MYVAR=MONGO_OPTIONS=/?ssl=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0" process_memory env
+```
 
 ### (Opcional) Instalar o Portainer - Ambiente de Desenvolvimento
 Para facilitar a gestão e visualização de containers no ambiente local, pode-se instalar o Portainer:
