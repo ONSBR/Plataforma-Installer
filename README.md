@@ -54,7 +54,7 @@ O Plataforma-Installer está configurado para acessar por padrão repositórios 
       - MONGO_HOST=mongo
       - MONGO_OPTIONS=/?ssl=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0
 ```
-2. Outra opção, caso o container já esteja rodando, é rodar o comando abaixo:
+2. Caso o container já esteja em execução, use o comando abaixo:
 ```
 docker exec -e "MYVAR=MONGO_OPTIONS=/?ssl=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0" process_memory env
 ```
