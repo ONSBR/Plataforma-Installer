@@ -41,8 +41,7 @@ Referência: https://docs.docker.com/compose/reference/up/
 
 O Plataforma-Installer está configurado para acessar por padrão repositórios locais, e portanto, a variável de ambiente MONGO_OPTIONS precisa estar presente para que o DocumentDB seja usado.
 
-
-1. Inserir a variável de ambiente antes da sua inicialização, no arquivo docker_compose.yaml:
+Inserir a variável de ambiente MONGO_OPTIONS antes da sua inicialização, no arquivo docker_compose.yaml:
 ```
   process_memory:
     build:
