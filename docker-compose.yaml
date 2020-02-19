@@ -76,17 +76,6 @@ services:
       - "traefik.process_memory.frontend.rule=PathPrefixStrip: /process_memory"
       - traefik.docker.network=plataforma_network
       - traefik.port=9091
-  platform_memory:
-    build:
-      context: ./Dockerfiles
-      dockerfile: DPlatformMemory
-    container_name: "platform_memory"
-    ports:
-      - 9099:80
-    environment:
-      - DOCDB_HOST=plataforma-docdb.cluster-czqebrnlxa8n.us-east-1.docdb.amazonaws.com
-      - DOCDB_DATABASE_NAME=platform_memory
-      - DOCDB_REPLICASET=rs0      
   apicore:
     build:
       context: ./Dockerfiles

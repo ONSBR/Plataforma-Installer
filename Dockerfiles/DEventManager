@@ -1,5 +1,5 @@
-FROM alpine:latest
-ADD event-manager /
+FROM python:3.7-stretch
+ADD event-manager  /
 ENV PORT 8081
 RUN chmod +x event-manager
 ENTRYPOINT ["/event-manager"]
