@@ -76,6 +76,18 @@ services:
       - "traefik.process_memory.frontend.rule=PathPrefixStrip: /process_memory"
       - traefik.docker.network=plataforma_network
       - traefik.port=9091
+  reprocess:
+    build:
+      context: ./Dockerfiles
+      dockerfile: DReprocess
+    container_name: "reprocess"
+    ports:
+      - 9099:9099
+    labels:
+      - traefik.backend=reprocess
+      - "traefik.process_memory.frontend.rule=PathPrefixStrip: /reprocess"
+      - traefik.docker.network=plataforma_network
+      - traefik.port=9099
   apicore:
     build:
       context: ./Dockerfiles
