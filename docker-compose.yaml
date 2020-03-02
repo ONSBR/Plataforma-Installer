@@ -51,8 +51,10 @@ services:
       - "rabbitmq"
       - "postgres"
       - "domain_schema"
+      - "process_memory"
     environment:
       - SCHEMA_URI=http://schema/api/v1/entitymap/
+      - PROCESS_MEMORY_URI=http://process_memory:9091/
       - POSTGRES_HOST=postgres
   domain_reader_worker:
     build:
@@ -88,6 +90,17 @@ services:
       - "traefik.process_memory.frontend.rule=PathPrefixStrip: /reprocess"
       - traefik.docker.network=plataforma_network
       - traefik.port=9099
+    depends_on:
+      - "rabbitmq"
+      - "domain_schema"
+      - "process_memory"
+      - "domain_reader"
+    environment:
+      - SCHEMA_URI=http://schema/api/v1/entitymap/
+      - PROCESS_MEMORY_URI=http://process_memory:9091/
+      - EVENT_MANAGER_URI=http://event_manager:8081/
+      - DOMAIN_READER_URI=http://reader:9093/reader/api/v1/
+      - RABBIT_MQ=rabbitmq
   apicore:
     build:
       context: ./Dockerfiles
