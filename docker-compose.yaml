@@ -136,80 +136,7 @@ services:
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
       - MONGO_HOST=mongo:27017
-      - MAESTRO_HOST=maestro
     depends_on:
-      - "rabbitmq"
-      - "postgres"
-  maestro:
-    build:
-      context: ./Dockerfiles
-      dockerfile: DMaestro
-    container_name: "maestro"
-    ports:
-      - 6971:6971
-    environment:
-      - EXECUTOR_HOST=executor
-      - DISCOVERY_HOST=discovery
-      - PROCESS_MEMORY_HOST=process_memory
-      - ROUTER_HOST=http_router
-      - INFLUX_HOST=influxdb
-      - APICORE_HOST=apicore
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_API_PORT=15672
-      - RABBITMQ_AMQP_PORT=5672
-      - RABBITMQ_USERNAME=guest
-      - RABBITMQ_PASSWORD=guest
-      - MONGO_HOST=mongo:27017
-      - EVENT_MANAGER_HOST=event_manager
-      - WAUTO_REPROCESSING_ec498841-59e5-47fd-8075-136d79155705=True
-    depends_on:
-      - "event_manager"
-      - "apicore"
-      - "discovery"
-      - "rabbitmq"
-      - "process_memory"
-  discovery:
-    build:
-      context: ./Dockerfiles
-      dockerfile: DDiscovery
-    container_name: "discovery"
-    ports:
-      - 8090:8090
-    environment:
-      - PROCESS_MEMORY_HOST=process_memory
-      - APICORE_HOST=apicore
-      - POSTGRES_HOST=postgres
-    depends_on:
-      - "apicore"
-      - "process_memory"
-      - "rabbitmq"
-      - "postgres"
-  ui:
-    build:
-      context: ./Dockerfiles
-      dockerfile: DFront
-    container_name: "ui"
-    ports:
-      - 8384:8384
-    environment:
-      - PROCESS_MEMORY_HOST=process_memory
-      - REPLAY_HOST=replay
-      - APICORE_HOST=apicore
-      - EVENT_MANAGER_HOST=event_manager
-      - MAESTRO_HOST=maestro
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_API_PORT=15672
-      - RABBITMQ_USERNAME=guest
-      - RABBITMQ_PASSWORD=guest
-    labels:
-      - traefik.backend=ui
-      - "traefik.ui.frontend.rule=PathPrefixStrip: /ui"
-      - traefik.docker.network=plataforma_network
-      - traefik.port=8384
-    depends_on:
-      - "apicore"
-      - "process_memory"
-      - "event_manager"
       - "rabbitmq"
       - "postgres"
   executor:
@@ -242,7 +169,7 @@ services:
       - traefik.docker.network=plataforma_network
       - traefik.port=8085
     extra_hosts:
-      poptst.ons.org.br: 10.107.26.2      
+      poptst.ons.org.br: 10.107.26.2
   celery:
     build:
       context: ./Dockerfiles
