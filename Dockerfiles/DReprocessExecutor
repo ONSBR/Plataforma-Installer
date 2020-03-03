@@ -17,4 +17,4 @@ RUN cp /var/cron/reprocess/deploy/reprocess.sh /reprocess.sh
 RUN chmod +x /crontab_entrypoint.sh
 RUN chmod +x /reprocess.sh
 
-ENTRYPOINT ["sh", "/crontab_entrypoint.sh"]
+ENTRYPOINT /./crontab_entrypoint.sh
