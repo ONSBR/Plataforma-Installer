@@ -101,6 +101,19 @@ services:
       - EVENT_MANAGER_URI=http://event_manager:8081/
       - DOMAIN_READER_URI=http://reader:9093/reader/api/v1/
       - RABBIT_MQ=rabbitmq
+  reprocess_executor:
+    build:
+      context: ./Dockerfiles
+      dockerfile: DReprocessExecutor
+    container_name: "reprocess_executor"
+    depends_on:
+      - "rabbitmq"
+      - "domain_schema"
+      - "event_manager"
+    environment:
+      - SCHEMA_URI=http://schema/api/v1/
+      - EVENT_MANAGER_URI=http://event_manager:8081/
+      - RABBIT_MQ=rabbitmq
   apicore:
     build:
       context: ./Dockerfiles
