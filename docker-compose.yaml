@@ -19,6 +19,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=platform_domain_schema
+      - POSTGRES_HOST_AUTH_METHOD=trust
   mongo:
     image: mongo:latest
     container_name: "mongo"
@@ -201,6 +202,8 @@ services:
       - EVENT_MANAGER_PORT=8081
       - RABBITMQ_URL=rabbitmq
       - RABBITMQ_PORT=5672
+      - SCHEMA_URL=schema
+      - SCHEMA_PORT=80
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
       - C_FORCE_ROOT=true
