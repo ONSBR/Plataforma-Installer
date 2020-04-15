@@ -100,7 +100,7 @@ services:
       - SCHEMA_URI=http://schema/api/v1/entitymap/
       - PROCESS_MEMORY_URI=http://process_memory:9091/
       - EVENT_MANAGER_URI=http://event_manager:8081/
-      - DOMAIN_READER_URI=http://reader:9093/reader/api/v1/
+      - DOMAIN_READER_URI=http://reader/reader/api/v1/
       - RABBIT_MQ=rabbitmq
   reprocess_executor:
     build:
