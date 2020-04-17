@@ -163,6 +163,8 @@ services:
       - PROCESS_MEMORY_PORT=9091
       - COREAPI_URL=apicore
       - COREAPI_PORT=9110
+      - SCHEMA_URL=schema
+      - SCHEMA_PORT=80
       - EVENT_MANAGER_URL=event_manager
       - EVENT_MANAGER_PORT=8081
       - EXEC=gunicorn -b :8000 runner.api:runner_api
