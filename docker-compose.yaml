@@ -54,7 +54,7 @@ services:
       - "domain_schema"
       - "process_memory"
     environment:
-      - SCHEMA_URI=http://schema/api/v1/entitymap/
+      - SCHEMA_URI=http://schema/api/v1/
       - PROCESS_MEMORY_URI=http://process_memory:9091/
       - POSTGRES_HOST=postgres
   domain_reader_worker:
@@ -97,7 +97,7 @@ services:
       - "process_memory"
       - "domain_reader"
     environment:
-      - SCHEMA_URI=http://schema/api/v1/entitymap/
+      - SCHEMA_URI=http://schema/api/v1/
       - PROCESS_MEMORY_URI=http://process_memory:9091/
       - EVENT_MANAGER_URI=http://event_manager:8081/
       - DOMAIN_READER_URI=http://reader/reader/api/v1/

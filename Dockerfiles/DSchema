@@ -11,7 +11,7 @@ EXPOSE 80
 #
 # DEPLOY APP
 #
-RUN git clone --branch reprocess https://github.com/onsplatform/domain_schema.git /var/www/schema
+RUN git clone --branch reprocess_config https://github.com/onsplatform/domain_schema.git /var/www/schema
 
 WORKDIR /var/www/schema/
 
