@@ -12,7 +12,7 @@ ENV GUNICORN_TIMEOUT 120
 #
 # DEPLOY APP
 #
-RUN git clone --branch reprocess https://github.com/onsplatform/domain_reader.git /var/www/reader
+RUN git clone --branch reprocess_config https://github.com/onsplatform/domain_reader.git /var/www/reader
 
 WORKDIR /var/www/reader/
 
