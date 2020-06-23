@@ -4,7 +4,7 @@ RUN apt-get update -y && apt-get install git -y
 RUN apt-get update -y && apt-get install python-dev build-essential libpq-dev libffi-dev libssl-dev -y
 
 WORKDIR /
-RUN git clone --branch reprocess https://github.com/ONSBR/Plataforma-ApiCore.git
+RUN git clone --branch 0.1.0 https://github.com/ONSBR/Plataforma-ApiCore.git
 WORKDIR /Plataforma-ApiCore/plataforma_apicore
 
 
