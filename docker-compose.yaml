@@ -1,5 +1,4 @@
 version: "2"
-
 services:
   reverse-proxy:
     image: traefik:maroilles # The official Traefik docker image
@@ -18,7 +17,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=platform_domain_schema
+      - POSTGRES_DB=${POSTGRES_DOMAIN_BD}
       - POSTGRES_HOST_AUTH_METHOD=trust
   mongo:
     image: mongo:latest
@@ -30,6 +29,11 @@ services:
       context: ./Dockerfiles
       dockerfile: DSchema
     container_name: "schema"
+    environment:
+      - POSTGRES_HOST=${POSTGRES_DOMAIN_HOST}
+      - POSTGRES_DB=${POSTGRES_DOMAIN_BD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PWD}
     ports:
       - 9092:80
     depends_on:
@@ -39,8 +43,14 @@ services:
       context: ./Dockerfiles
       dockerfile: DWorker
     container_name: "schema_worker"
+    environment:
+      - POSTGRES_HOST=${POSTGRES_DOMAIN_HOST}
+      - POSTGRES_DB=${POSTGRES_DOMAIN_BD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PWD}
     depends_on:
       - "rabbitmq"
+      - "postgres"
   domain_reader:
     build:
       context: ./Dockerfiles
@@ -50,13 +60,17 @@ services:
       - 9093:80
     depends_on:
       - "rabbitmq"
-      - "postgres"
       - "domain_schema"
       - "process_memory"
+      - "postgres"
     environment:
+      - GUNICORN_TIMEOUT=600
       - SCHEMA_URI=http://schema/api/v1/
       - PROCESS_MEMORY_URI=http://process_memory:9091/
-      - POSTGRES_HOST=postgres
+      - POSTGRES_HOST=${POSTGRES_DOMAIN_HOST}
+      - POSTGRES_DB=${POSTGRES_DOMAIN_BD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PWD}
   domain_reader_worker:
     build:
       context: ./Dockerfiles
@@ -64,6 +78,12 @@ services:
     container_name: "reader_worker"
     depends_on:
       - "rabbitmq"
+      - "postgres"
+    environment:
+      - POSTGRES_HOST=${POSTGRES_DOMAIN_HOST}
+      - POSTGRES_DB=${POSTGRES_DOMAIN_BD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PWD}
   process_memory:
     build:
       context: ./Dockerfiles
@@ -72,13 +92,19 @@ services:
     ports:
       - 9091:9091
     environment:
-      - MONGO_HOST=mongo
-      - MONGO_OPTIONS=/?ssl=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0
+      - DOCDB_USER=${MONGO_USER}
+      - DOCDB_SECRET=${MONGO_PWD}
+      - HOST=${MONGO_HOST}
+      - DOCDB_PORT=${MONGO_PORT}
+      - DATABASE_NAME=${MONGO_DATABASE_NAME}
+      - DOCDB_REPLICASET=${MONGO_REPLICASET}
     labels:
       - traefik.backend=process_memory
       - "traefik.process_memory.frontend.rule=PathPrefixStrip: /process_memory"
       - traefik.docker.network=plataforma_network
       - traefik.port=9091
+    depends_on:
+      - "mongo"
   reprocess:
     build:
       context: ./Dockerfiles
@@ -123,8 +149,10 @@ services:
     ports:
       - 9110:9110
     environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_USER=postgres
+      - POSTGRES_HOST=${POSTGRES_DOMAIN_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PWD}
+      - DB_NAME=${POSTGRES_APICORE_BD}
       - PROCESS_MEMORY_PORT=9091
       - COREAPI_URL=apicore
       - COREAPI_PORT=9110
@@ -149,10 +177,8 @@ services:
       - RABBITMQ_AMQP_PORT=5672
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
-      - MONGO_HOST=mongo:27017
     depends_on:
       - "rabbitmq"
-      - "postgres"
   executor:
     build:
       context: ./Dockerfiles
@@ -185,7 +211,7 @@ services:
       - traefik.docker.network=plataforma_network
       - traefik.port=8085
     extra_hosts:
-      poptst.ons.org.br: 10.107.26.2
+      hompops.ons.org.br: 10.105.127.79
   celery:
     build:
       context: ./Dockerfiles
@@ -212,7 +238,6 @@ services:
     depends_on:
       - "event_manager"
       - "rabbitmq"
-      - "postgres"
   registry:
     image: "registry:2"
     container_name: "registry"
