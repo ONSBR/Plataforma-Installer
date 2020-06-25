@@ -2,7 +2,7 @@ FROM python:3.7-stretch
 
 RUN apt-get -y update && apt-get -y upgrade && apt-get install nginx git -y
 
-RUN git clone --branch 0.1.0 https://github.com/onsplatform/process_memory.git /var/www/memory
+RUN git clone --branch 0.1.1 https://github.com/onsplatform/process_memory.git /var/www/memory
 
 WORKDIR /var/www/memory
 
