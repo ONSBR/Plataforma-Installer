@@ -24,6 +24,8 @@ services:
     container_name: "mongo"
     ports:
       - 27017:27017
+    volumes:
+      - mongodata:/data/db
   domain_schema:
     build:
       context: ./Dockerfiles
@@ -293,3 +295,4 @@ networks:
       name: plataforma_network
 volumes:
   pgdata:
+  mongodata:
