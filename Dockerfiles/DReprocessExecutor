@@ -2,7 +2,7 @@ FROM python:3.7-stretch
 
 RUN apt-get -y update && apt-get -y upgrade && apt-get install git -y cron
 
-RUN git clone -b 0.1.0 https://github.com/onsplatform/platform_reprocess.git /var/cron/reprocess
+RUN git clone -b 0.1.2 https://github.com/onsplatform/platform_reprocess.git /var/cron/reprocess
 
 WORKDIR /var/cron/reprocess
 

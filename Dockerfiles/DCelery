@@ -2,7 +2,7 @@ FROM python:3.6.9-slim
 
 RUN apt-get update -y && apt-get install git -y
 
-RUN git clone -b 0.1.0 https://github.com/ONSBR/Plataforma-Executor.git /app
+RUN git clone -b 0.1.2 https://github.com/ONSBR/Plataforma-Executor.git /app
 WORKDIR /app
 
 RUN pip install -U pip gunicorn

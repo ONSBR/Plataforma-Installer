@@ -2,7 +2,7 @@ FROM python:3.7-stretch
 
 RUN apt-get update -y && apt-get install git -y
 
-RUN git clone --branch 0.1.0 https://github.com/ONSBR/Plataforma-Executor.git /app
+RUN git clone --branch 0.1.2 https://github.com/ONSBR/Plataforma-Executor.git /app
 WORKDIR /app
 
 RUN pip install -U pip gunicorn
