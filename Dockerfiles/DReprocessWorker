@@ -2,7 +2,7 @@ FROM python:3.7-stretch
 
 RUN apt-get -y update && apt-get -y upgrade && apt-get -y install git
 
-RUN git clone -b fix_reprocess_celery https://github.com/onsplatform/platform_reprocess.git /var/worker/reprocess
+RUN git clone -b fix_reprocess https://github.com/onsplatform/platform_reprocess.git /var/worker/reprocess
 
 WORKDIR /var/worker/reprocess
 
