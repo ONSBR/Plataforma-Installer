@@ -141,7 +141,9 @@ services:
       - EVENT_MANAGER_URI=http://event_manager:8081/
       - DOMAIN_READER_URI=http://reader/reader/api/v1/
       - RABBIT_MQ=rabbitmq
+      - COREAPI_URL=http://apicore:9110/
     depends_on:
+      - "apicore"
       - "rabbitmq"
       - "postgres"
   reprocess_executor:
